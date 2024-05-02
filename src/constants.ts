@@ -24,3 +24,56 @@ export const FONT_SIZE = {
   sm: hp('1.8%'),
   xs: hp('1.3%'),
 };
+
+export const data = [
+  {
+    id: '1',
+    name: 'One Stop Centre',
+    description: 'One Stop Centres (OSCs) are a scheme by the Ministry',
+  },
+  {
+    id: '2',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '3',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '4',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '5',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '6',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '7',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '8',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '9',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+  {
+    id: '10',
+    name: 'Beti Bachao Beti Padhao',
+    description: 'Beti Bachao, Beti Padhao translates to Save the girl child',
+  },
+];

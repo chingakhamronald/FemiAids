@@ -9,10 +9,12 @@ import Dashboard from '../screen/Dashboard';
 import {COLOR_TYPE, FONT_FAMILY, FONT_SIZE} from '../constants';
 import ProfileSvg from '../../assets/icons/profile.svg';
 import {TouchableOpacity} from 'react-native';
+import Schemes from '../screen/Schemes';
 
 export type MainList = {
   Home: undefined;
   Dashboard: undefined;
+  Schemes: undefined;
 };
 
 export type MainNavProps<T extends keyof MainList> = NavProps<
@@ -55,6 +57,7 @@ const MainNavigation: FC = () => {
           ),
         }}
       />
+      <Stack.Screen name="Schemes" component={Schemes} />
     </Stack.Navigator>
   );
 };
