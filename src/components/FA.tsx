@@ -2,6 +2,10 @@ import {StyleSheet} from 'react-native';
 import React, {FC} from 'react';
 import {AnimatedFAB} from 'react-native-paper';
 import Emergency_svg from '../../assets/icons/Emergency_Button.svg';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
 const FA: FC = () => {
   return (
@@ -25,8 +29,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   fabStyle: {
-    bottom: 30,
-    right: 20,
+    bottom: hp('4%'),
+    right: wp('8%'),
     position: 'absolute',
   },
 });

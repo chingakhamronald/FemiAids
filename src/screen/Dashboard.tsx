@@ -7,25 +7,29 @@ import {Button} from 'react-native-paper';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {COLOR_TYPE, FONT_FAMILY, data} from '../constants';
 import {MainNavProps} from '../router/MainNavigation';
+import Statusbar from '../components/Statusbar';
 
 const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
   return (
-    <View style={styleMain.flexGrow}>
-      <View style={styles.container}>
-        <Text style={[styleMain.subheader, {fontFamily: FONT_FAMILY.bold}]}>
-          Schemes
-        </Text>
-        <Button
-          mode="contained"
-          style={styles.btn}
-          labelStyle={{color: COLOR_TYPE.blue}}
-          onPress={() => navigation.navigate('Schemes')}>
-          See more
-        </Button>
+    <>
+      <Statusbar backgroundColor={COLOR_TYPE.secondary} />
+      <View style={styleMain.flexGrow}>
+        <View style={styles.container}>
+          <Text style={[styleMain.subheader, {fontFamily: FONT_FAMILY.bold}]}>
+            Schemes
+          </Text>
+          <Button
+            mode="contained"
+            style={styles.btn}
+            labelStyle={{color: COLOR_TYPE.blue}}
+            onPress={() => navigation.navigate('Schemes')}>
+            See more
+          </Button>
+        </View>
+        <SchemesList schemesData={data} />
+        <FA />
       </View>
-      <SchemesList schemesData={data} />
-      <FA />
-    </View>
+    </>
   );
 };
 

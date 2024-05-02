@@ -6,32 +6,38 @@ import HomeSvg from '../../assets/icons/home.svg';
 import Logo from '../../assets/icons/FemAid_Logo.svg';
 import {styleMain} from '../styles';
 import {MainNavProps} from '../router/MainNavigation';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import Statusbar from '../components/Statusbar';
 
 const Home: FC<MainNavProps<'Home'>> = ({navigation}) => {
   return (
-    <View style={styles.container}>
-      <HomeSvg style={styles.img} />
-      <View style={styles.buttonContainer}>
-        <View style={styles.logoContainer}>
-          <Logo style={styles.img1} />
-          <Text style={[styleMain.header, {color: COLOR_TYPE.white}]}>
-            FemiAids
-          </Text>
+    <>
+      <Statusbar backgroundColor={COLOR_TYPE.secondary} />
+      <View style={styles.container}>
+        <HomeSvg style={styles.img} />
+        <View style={styles.buttonContainer}>
+          <View style={styles.logoContainer}>
+            <Logo style={styles.img1} />
+            <Text style={[styleMain.header, {color: COLOR_TYPE.white}]}>
+              FemiAids
+            </Text>
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styleMain.header}>Welcome to FemiAids</Text>
+            <Text style={styleMain.subheader}>
+              Safety and Support in One Touch
+            </Text>
+          </View>
+          <Button
+            mode="contained"
+            style={styles.button}
+            labelStyle={styles.text}
+            onPress={() => navigation.navigate('Dashboard')}>
+            Get Started
+          </Button>
         </View>
-        <View style={styles.textContainer}>
-          <Text style={styleMain.header}>Welcome to FemiAids</Text>
-          <Text style={styleMain.subheader}>
-            Safety and Support in One Touch
-          </Text>
-        </View>
-        <Button
-          mode="contained"
-          style={styles.button}
-          onPress={() => navigation.navigate('Dashboard')}>
-          <Text style={styles.text}>Get Started</Text>
-        </Button>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -56,9 +62,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     zIndex: 2,
+    width: '100%',
+    paddingHorizontal: hp('3%'),
   },
   button: {
-    paddingHorizontal: 100,
     backgroundColor: COLOR_TYPE.blue,
     borderRadius: 10,
   },
@@ -66,7 +73,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   logoContainer: {
-    bottom: '200%',
+    bottom: '190%',
     display: 'flex',
     alignItems: 'flex-start',
   },
