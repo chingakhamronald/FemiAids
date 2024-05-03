@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {FlatList, StyleSheet, View, Text} from 'react-native';
+import {FlatList, StyleSheet, View, Text, Linking} from 'react-native';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -90,8 +90,18 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
 export default SchemesList;
 
 const Btn = () => {
+  const handleLink = () => {
+    const pdfLink =
+      'https://wcd.nic.in/sites/default/files/Beti%20Bachao-Beti%20Padao_English.pdf';
+
+    return Linking.openURL(pdfLink);
+  };
   return (
-    <Button mode="contained" style={styles.btn} labelStyle={styles.text}>
+    <Button
+      mode="contained"
+      style={styles.btn}
+      labelStyle={styles.text}
+      onPress={handleLink}>
       More Details
     </Button>
   );

@@ -7,13 +7,18 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 
-const FA: FC = () => {
+interface IFaProps {
+  showModal: (value: boolean) => void;
+  visible: boolean;
+}
+
+const FA: FC<IFaProps> = ({showModal, visible}) => {
   return (
     <AnimatedFAB
       icon={Emergency_svg}
       label={'Label'}
       extended={false}
-      onPress={() => console.log('Pressed')}
+      onPress={() => showModal(!visible)}
       visible={true}
       animateFrom={'right'}
       iconMode={'static'}
