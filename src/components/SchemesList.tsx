@@ -18,6 +18,7 @@ interface schemesData {
 interface ISchemesProps {
   schemesData: schemesData[];
 }
+const Icons = () => <Filter_svg />;
 
 const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
   return (
@@ -37,12 +38,12 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
                 width: wp('40%'),
               },
             ]}
-            contentStyle={{flexDirection: 'row-reverse'}}
+            contentStyle={styles.flexReverse}
             labelStyle={[
               styles.text,
               {color: COLOR_TYPE.blue, fontSize: FONT_SIZE.md},
             ]}
-            icon={() => <Filter_svg />}>
+            icon={Icons}>
             Category
           </Button>
           <Button
@@ -59,8 +60,8 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
               styles.text,
               {color: COLOR_TYPE.blue, fontSize: FONT_SIZE.md},
             ]}
-            icon={() => <Filter_svg />}
-            contentStyle={{flexDirection: 'row-reverse'}}>
+            icon={Icons}
+            contentStyle={styles.flexReverse}>
             Age
           </Button>
         </View>
@@ -144,5 +145,8 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.regular,
     fontSize: hp('1.5%'),
     color: COLOR_TYPE.white,
+  },
+  flexReverse: {
+    flexDirection: 'row-reverse',
   },
 });

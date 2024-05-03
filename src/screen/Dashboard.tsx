@@ -16,6 +16,7 @@ import {COLOR_TYPE, FONT_FAMILY, FONT_SIZE, data} from '../constants';
 import {MainNavProps} from '../router/MainNavigation';
 import Statusbar from '../components/Statusbar';
 import MedicalList from '../components/MedicalList';
+import AppBar from '../components/AppBar';
 
 type emergencyDataType = {
   id: string;
@@ -36,6 +37,7 @@ const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
   return (
     <>
       <Statusbar backgroundColor={COLOR_TYPE.secondary} />
+      <AppBar navigation={navigation} check={false} />
       <View style={styleMain.flexGrow}>
         <View>
           <Text
@@ -45,12 +47,10 @@ const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
             ]}>
             Medical Help
           </Text>
-          <MedicalList />
+          <MedicalList navigation={navigation} />
         </View>
         <View style={styles.container}>
-          <Text style={[styleMain.subheader, {fontFamily: FONT_FAMILY.bold}]}>
-            Schemes
-          </Text>
+          <Text style={styleMain.header}>Schemes</Text>
           <Button
             mode="contained"
             style={styles.btn}

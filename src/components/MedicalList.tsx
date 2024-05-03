@@ -1,5 +1,5 @@
 import {View, Text, FlatList, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {FC} from 'react';
 import {Avatar} from 'react-native-paper';
 import {
   widthPercentageToDP as wp,
@@ -7,8 +7,13 @@ import {
 } from 'react-native-responsive-screen';
 import {styleMain} from '../styles';
 import {FONT_FAMILY, FONT_SIZE} from '../constants';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
-const MedicalList = () => {
+interface IMedicalList {
+  navigation: any;
+}
+
+const MedicalList: FC<IMedicalList> = ({navigation}) => {
   return (
     <>
       <FlatList
@@ -18,11 +23,14 @@ const MedicalList = () => {
         renderItem={({item}) => {
           return (
             <View style={styles.container}>
-              <Avatar.Image
-                source={{uri: item.img_url}}
-                size={90}
-                style={styles.elevation}
-              />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('MedicalDetails')}>
+                <Avatar.Image
+                  source={{uri: item.img_url}}
+                  size={90}
+                  style={styles.elevation}
+                />
+              </TouchableOpacity>
               <Text
                 style={[
                   styleMain.subheader,
