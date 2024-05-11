@@ -6,19 +6,24 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import {CHECK_SCREEN} from '../constants';
 
 interface IFaProps {
-  showModal: (value: boolean) => void;
   visible: boolean;
+  showModal: (value: boolean) => void;
+  setName: (value: string) => void;
 }
 
-const FA: FC<IFaProps> = ({showModal, visible}) => {
+const FA: FC<IFaProps> = ({showModal, visible, setName}) => {
   return (
     <AnimatedFAB
       icon={Emergency_svg}
       label={'Label'}
       extended={false}
-      onPress={() => showModal(!visible)}
+      onPress={() => {
+        showModal(!visible);
+        setName(CHECK_SCREEN.DASHBOARD);
+      }}
       visible={true}
       animateFrom={'right'}
       iconMode={'static'}

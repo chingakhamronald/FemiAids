@@ -15,7 +15,13 @@ export type MainList = {
   Dashboard: undefined;
   Schemes: undefined;
   Splash: undefined;
-  MedicalDetails: undefined;
+  MedicalDetails: {
+    id: string;
+    medicalName: string;
+    description: string;
+    symptoms: string;
+    treatment: string;
+  };
 };
 
 export type MainNavProps<T extends keyof MainList> = NavProps<

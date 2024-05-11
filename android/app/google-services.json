@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "86512785796",
+    "firebase_url": "https://femiaids-default-rtdb.firebaseio.com",
+    "project_id": "femiaids",
+    "storage_bucket": "femiaids.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86512785796:android:0a6e8991524479f531e5d1",
+        "android_client_info": {
+          "package_name": "com.femiaids"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDav1AyOEm4_BK2J4VbTAgtc4LEZ3LBL18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

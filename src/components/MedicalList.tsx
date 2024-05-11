@@ -1,5 +1,5 @@
 import {View, Text, FlatList, StyleSheet} from 'react-native';
-import React, {FC} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {Avatar} from 'react-native-paper';
 import {
   widthPercentageToDP as wp,
@@ -8,25 +8,77 @@ import {
 import {styleMain} from '../styles';
 import {FONT_FAMILY, FONT_SIZE} from '../constants';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import firestore from '@react-native-firebase/firestore';
 
 interface IMedicalList {
   navigation: any;
 }
 
+interface IMedicalData {
+  id: string;
+  name: string;
+  img: string;
+  description: string;
+  symptoms: string;
+  treatment: string;
+}
+
 const MedicalList: FC<IMedicalList> = ({navigation}) => {
+  const [loading, setLoading] = useState(false);
+  const [medicalData, setMedicalData] = useState<IMedicalData[]>([]);
+
+  const ref = firestore().collection('medical');
+
+  useEffect(() => {
+    const unsubscribe = ref.onSnapshot(querySnapshot => {
+      const fetchedMedical: any = [];
+
+      querySnapshot.forEach(doc => {
+        const {description, img, name, symptoms, treatment} = doc.data();
+        fetchedMedical.push({
+          id: doc.id,
+          description: description,
+          img: img,
+          name: name,
+          symptoms: symptoms,
+          treatment: treatment,
+        });
+      });
+
+      setMedicalData(fetchedMedical);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [ref]);
+
+  const onRefresh = () => {
+    setLoading(true);
+  };
+
   return (
     <>
       <FlatList
         data={medicalData}
+        refreshing={loading}
+        onRefresh={onRefresh}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={({item}) => {
           return (
             <View style={styles.container}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('MedicalDetails')}>
+                onPress={() =>
+                  navigation.navigate('MedicalDetails', {
+                    id: item.id,
+                    medicalName: item.name,
+                    description: item.description,
+                    symptoms: item.symptoms,
+                    treatment: item.treatment,
+                  })
+                }>
                 <Avatar.Image
-                  source={{uri: item.img_url}}
+                  source={{uri: item.img}}
                   size={90}
                   style={styles.elevation}
                 />
@@ -59,36 +111,3 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 });
-
-const medicalData = [
-  {
-    id: '1',
-    name: 'Skin care',
-    img_url:
-      'https://images.pexels.com/photos/2622187/pexels-photo-2622187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '2',
-    name: 'Breast Cancer',
-    img_url:
-      'https://images.pexels.com/photos/2622187/pexels-photo-2622187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '3',
-    name: 'HIV/AIDs',
-    img_url:
-      'https://images.pexels.com/photos/2622187/pexels-photo-2622187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '4',
-    name: 'Pregnency',
-    img_url:
-      'https://images.pexels.com/photos/2622187/pexels-photo-2622187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-  {
-    id: '5',
-    name: 'Mental Health',
-    img_url:
-      'https://images.pexels.com/photos/2622187/pexels-photo-2622187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  },
-];

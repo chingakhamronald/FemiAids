@@ -13,6 +13,7 @@ interface schemesData {
   id: string;
   name: string;
   description: string;
+  url: string;
 }
 
 interface ISchemesProps {
@@ -76,7 +77,7 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
                 title={item.name}
                 titleStyle={[styleMain.header, {fontSize: hp('2.5%')}]}
                 style={styles.card}
-                right={Btn}
+                right={() => <Btn URL={item.url} />}
               />
             </View>
           );
@@ -90,12 +91,9 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
 
 export default SchemesList;
 
-const Btn = () => {
+const Btn: FC<{URL: string}> = ({URL}) => {
   const handleLink = () => {
-    const pdfLink =
-      'https://wcd.nic.in/sites/default/files/Beti%20Bachao-Beti%20Padao_English.pdf';
-
-    return Linking.openURL(pdfLink);
+    return Linking.openURL(URL);
   };
   return (
     <Button

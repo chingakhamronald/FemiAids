@@ -1,38 +1,82 @@
 import {Linking, StyleSheet, Text, View} from 'react-native';
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {styleMain} from '../styles';
 import FA from '../components/FA';
 import SchemesList from '../components/SchemesList';
-import {
-  Button,
-  Divider,
-  IconButton,
-  Modal,
-  Portal,
-  Surface,
-} from 'react-native-paper';
+import {Button, IconButton, Modal, Portal, Surface} from 'react-native-paper';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import {COLOR_TYPE, FONT_FAMILY, FONT_SIZE, data} from '../constants';
+import {CHECK_SCREEN, COLOR_TYPE, FONT_FAMILY, FONT_SIZE} from '../constants';
 import {MainNavProps} from '../router/MainNavigation';
 import Statusbar from '../components/Statusbar';
 import MedicalList from '../components/MedicalList';
 import AppBar from '../components/AppBar';
+import {IUseStore, useStore} from '../hooks/useStore';
+import firestore from '@react-native-firebase/firestore';
 
 type emergencyDataType = {
-  id: string;
+  id: any;
   title: string;
   mobile_number: number;
 };
 
 const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
-  const [visible, setVisible] = useState<boolean>(false);
-
-  const showModal = (value: boolean) => setVisible(value);
-  const hideModal = () => setVisible(false);
+  const [emergencyData, setEmergencyData] = useState<emergencyDataType[]>([]);
 
   const handleLink = (mobile_number: number) => {
     return Linking.openURL(`tel:${mobile_number}`);
   };
+
+  const useVisibleState = useStore((state: IUseStore) => state);
+
+  const fetchDataFromMultipleCollections = (storeDate: IUseStore) => {
+    const fetchedScheme: any = [];
+
+    const fetchedEmergency: any = [];
+
+    const schemeQuery = firestore().collection('scheme');
+    const emergencyQuery = firestore().collectionGroup('emergency');
+
+    schemeQuery
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const {category, description, name, url} = doc.data();
+          fetchedScheme.push({
+            id: doc.id,
+            name: name,
+            description: description,
+            url: url,
+            category: category,
+          });
+        });
+        storeDate.setSchemeData(fetchedScheme);
+      })
+      .catch(error => {
+        console.error('Error fetching data from medical collection:', error);
+      });
+
+    emergencyQuery
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const {title, mobile_number} = doc.data();
+          fetchedEmergency.push({
+            id: doc.id,
+            title: title,
+            mobile_number: mobile_number,
+          });
+        });
+
+        setEmergencyData(fetchedEmergency);
+      })
+      .catch(error => {
+        console.error('Error fetching data from otherCollection:', error);
+      });
+  };
+
+  useEffect(() => {
+    fetchDataFromMultipleCollections(useVisibleState);
+  }, [useVisibleState]);
 
   return (
     <>
@@ -59,20 +103,31 @@ const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
             See more
           </Button>
         </View>
-        <SchemesList schemesData={data} />
+        <SchemesList schemesData={useVisibleState.scheme} />
         <Portal>
           <Modal
-            visible={visible}
-            onDismiss={hideModal}
+            visible={useVisibleState.visible}
+            onDismiss={() => {
+              useVisibleState.hideVisible(false);
+              useVisibleState.removeCheckScreen();
+            }}
             contentContainerStyle={styles.modal}>
             <View style={{marginVertical: hp('2%')}}>
               <View style={styles.flex}>
-                <Text style={styleMain.header}>Emergency</Text>
+                <Text style={styleMain.header}>
+                  Emergency{' '}
+                  {useVisibleState.checkScreen === CHECK_SCREEN.PROFILE
+                    ? 'Setting'
+                    : null}
+                </Text>
                 <IconButton
                   icon={'close-circle'}
                   iconColor={COLOR_TYPE.blue}
                   size={30}
-                  onPress={hideModal}
+                  onPress={() => {
+                    useVisibleState.showVisible(false);
+                    useVisibleState.removeCheckScreen();
+                  }}
                 />
               </View>
               {emergencyData.map((e: emergencyDataType) => {
@@ -95,11 +150,25 @@ const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
                   </View>
                 );
               })}
-              <Divider />
+              {useVisibleState.checkScreen === CHECK_SCREEN.PROFILE ? (
+                <Button
+                  mode="contained"
+                  buttonColor={COLOR_TYPE.blue}
+                  style={[
+                    styles.wrapper,
+                    {marginTop: hp('2%'), borderRadius: 10, padding: hp('1%')},
+                  ]}>
+                  Make Changes
+                </Button>
+              ) : null}
             </View>
           </Modal>
         </Portal>
-        <FA showModal={showModal} visible={visible} />
+        <FA
+          showModal={useVisibleState.showVisible}
+          visible={useVisibleState.visible}
+          setName={useVisibleState.setCheckScreen}
+        />
       </View>
     </>
   );
@@ -115,6 +184,7 @@ const styles = StyleSheet.create({
     marginHorizontal: hp('2%'),
     marginVertical: hp('2%'),
     alignItems: 'center',
+    textAlign: 'center',
   },
   btn: {
     borderRadius: 10,
@@ -148,21 +218,3 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
-
-const emergencyData = [
-  {
-    id: '1',
-    title: 'First Priority',
-    mobile_number: 6009421415,
-  },
-  {
-    id: '2',
-    title: 'Second Priority',
-    mobile_number: 8837312294,
-  },
-  {
-    id: '3',
-    title: 'Third Priority',
-    mobile_number: 6009421416,
-  },
-];

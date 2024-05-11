@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, ScrollView, Linking} from 'react-native';
-import React, {FC} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import AppBar from '../components/AppBar';
 import {MainNavProps} from '../router/MainNavigation';
 import {styleMain} from '../styles';
@@ -9,6 +9,7 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import firestore from '@react-native-firebase/firestore';
 
 type docType = {
   id: string;
@@ -20,25 +21,60 @@ type docType = {
   place: string;
 };
 
-type aboutsDataType = {
-  id: string;
+interface IAboutsProps {
   name: string;
   description: string;
-  symptoms: string;
   treatment: string;
-  doc: docType[];
-};
-
-interface IAboutsProps {
-  data: aboutsDataType;
+  symptoms: string;
+  data: docType[];
 }
 
-const MedicalDetails: FC<MainNavProps<'MedicalDetails'>> = ({navigation}) => {
+const MedicalDetails: FC<MainNavProps<'MedicalDetails'>> = ({
+  navigation,
+  route,
+}) => {
+  const [doctorData, setDoctorData] = useState<docType[]>([]);
+
+  const {id, description, medicalName, symptoms, treatment} = route.params;
+
+  const ref = firestore().collection('doctor').where('tag', '==', medicalName);
+
+  useEffect(() => {
+    const unsubscribe = ref.onSnapshot(querySnapshot => {
+      const fetchedMedical: any = [];
+
+      querySnapshot.forEach(doc => {
+        const {address, gender, hospital, mobile_number, name, place, tag} =
+          doc.data();
+        fetchedMedical.push({
+          id: doc.id,
+          name: name,
+          address: address,
+          hospital: hospital,
+          mobile_number: mobile_number,
+          gender: gender,
+          place: place,
+          tag: tag,
+        });
+      });
+
+      setDoctorData(fetchedMedical);
+    });
+
+    return () => unsubscribe();
+  }, [ref]);
+
   return (
     <>
       <AppBar navigation={navigation} check={true} />
       <View style={styleMain.flexGrow}>
-        <Abouts data={dataDD} />
+        <Abouts
+          data={doctorData}
+          description={description}
+          name={medicalName}
+          symptoms={symptoms}
+          treatment={treatment}
+        />
       </View>
     </>
   );
@@ -46,7 +82,13 @@ const MedicalDetails: FC<MainNavProps<'MedicalDetails'>> = ({navigation}) => {
 
 export default MedicalDetails;
 
-const Abouts: FC<IAboutsProps> = ({data}) => {
+const Abouts: FC<IAboutsProps> = ({
+  description,
+  name,
+  symptoms,
+  treatment,
+  data,
+}) => {
   const handleLink = (mobile_number: number) => {
     return Linking.openURL(`tel:${mobile_number}`);
   };
@@ -54,16 +96,16 @@ const Abouts: FC<IAboutsProps> = ({data}) => {
     <>
       <ScrollView contentContainerStyle={{minHeight: hp('60%')}}>
         <Surface style={styles.wrapper}>
-          <Text style={styleMain.header}>About {data.name}</Text>
-          <Text>{data.description}</Text>
+          <Text style={styleMain.header}>About {name}</Text>
+          <Text>{description}</Text>
 
           <Text style={styleMain.header}>Symptoms</Text>
-          <Text>{data.symptoms}</Text>
+          <Text>{symptoms}</Text>
 
           <Text style={styleMain.header}>Treatment</Text>
-          <Text>{data.treatment}</Text>
+          <Text>{treatment}</Text>
         </Surface>
-        {dataDD.doc.map(e => {
+        {data.map(e => {
           return (
             <Surface style={styles.docWrapper} key={e.id}>
               <View style={styles.flex}>
@@ -132,7 +174,6 @@ const styles = StyleSheet.create({
   btn: {
     flexDirection: 'row-reverse',
     height: 25,
-    textAlign: 'left',
   },
   label: {
     fontSize: FONT_SIZE.sm,
@@ -141,32 +182,3 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
 });
-
-const dataDD = {
-  id: '1',
-  name: 'HIV/AIDs',
-  description:
-    " HIV (human immunodeficiency virus) is a virus that attacks the body's immune system.",
-  symptoms: 'Fever and muscle pains, Headache, Sore throat.',
-  treatment: 'Antiretroviral therapy (ART) is the treatment for HIV',
-  doc: [
-    {
-      id: '1',
-      name: 'Dr Tombi',
-      gender: 'female',
-      address: 'Imphal Manipur, 795003',
-      mobile_number: 6009421413,
-      hospital: 'ABC Hospital',
-      place: 'Singjamei',
-    },
-    {
-      id: '2',
-      name: 'Dr Tomba',
-      gender: 'male',
-      address: 'Imphal Manipur, 795003',
-      mobile_number: 6009421413,
-      hospital: 'ABC Hospital',
-      place: 'Singjamei',
-    },
-  ],
-};

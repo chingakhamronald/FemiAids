@@ -1,8 +1,9 @@
 import React, {FC} from 'react';
 import {Appbar} from 'react-native-paper';
-import {COLOR_TYPE, FONT_FAMILY} from '../constants';
+import {CHECK_SCREEN, COLOR_TYPE, FONT_FAMILY} from '../constants';
 import {StyleSheet} from 'react-native';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {IUseStore, useStore} from '../hooks/useStore';
 
 interface IAppBarProps {
   navigation: any;
@@ -10,6 +11,8 @@ interface IAppBarProps {
 }
 
 const AppBar: FC<IAppBarProps> = ({navigation, check}) => {
+  const useStateStore = useStore((state: IUseStore) => state);
+
   return (
     <Appbar.Header style={styles.backgroundColor}>
       {check ? (
@@ -24,7 +27,10 @@ const AppBar: FC<IAppBarProps> = ({navigation, check}) => {
         icon={'account-circle'}
         size={35}
         color={COLOR_TYPE.black}
-        onPress={() => console.log('click')}
+        onPress={() => {
+          useStateStore.showVisible(true);
+          useStateStore.setCheckScreen(CHECK_SCREEN.PROFILE);
+        }}
       />
     </Appbar.Header>
   );
