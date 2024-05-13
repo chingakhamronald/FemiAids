@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, ScrollView, Linking} from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC} from 'react';
 import AppBar from '../components/AppBar';
 import {MainNavProps} from '../router/MainNavigation';
 import {styleMain} from '../styles';
@@ -9,17 +9,8 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import firestore from '@react-native-firebase/firestore';
-
-type docType = {
-  id: string;
-  name: string;
-  gender: string;
-  address: string;
-  mobile_number: number;
-  hospital: string;
-  place: string;
-};
+import {docType} from '../types';
+import {useQueryDoctor} from '../hooks/useQueryDoctor';
 
 interface IAboutsProps {
   name: string;
@@ -33,36 +24,13 @@ const MedicalDetails: FC<MainNavProps<'MedicalDetails'>> = ({
   navigation,
   route,
 }) => {
-  const [doctorData, setDoctorData] = useState<docType[]>([]);
-
   const {id, description, medicalName, symptoms, treatment} = route.params;
 
-  const ref = firestore().collection('doctor').where('tag', '==', medicalName);
+  const [doctorData] = useQueryDoctor(medicalName);
 
-  useEffect(() => {
-    const unsubscribe = ref.onSnapshot(querySnapshot => {
-      const fetchedMedical: any = [];
-
-      querySnapshot.forEach(doc => {
-        const {address, gender, hospital, mobile_number, name, place, tag} =
-          doc.data();
-        fetchedMedical.push({
-          id: doc.id,
-          name: name,
-          address: address,
-          hospital: hospital,
-          mobile_number: mobile_number,
-          gender: gender,
-          place: place,
-          tag: tag,
-        });
-      });
-
-      setDoctorData(fetchedMedical);
-    });
-
-    return () => unsubscribe();
-  }, [ref]);
+  if (doctorData === undefined) {
+    return;
+  }
 
   return (
     <>

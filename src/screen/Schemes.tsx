@@ -5,17 +5,21 @@ import {styleMain} from '../styles';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import AppBar from '../components/AppBar';
 import {MainNavProps} from '../router/MainNavigation';
-import {useStore} from '../hooks/useStore';
+import {useQueryScheme} from '../hooks/useQueryScheme';
 
 const Schemes: FC<MainNavProps<'Schemes'>> = ({navigation}) => {
-  const useSchemeStore = useStore(state => state);
+  const [schemeData] = useQueryScheme();
+
+  if (schemeData === undefined) {
+    return;
+  }
 
   return (
     <>
       <AppBar navigation={navigation} check={true} />
       <View style={styleMain.flexGrow}>
         <Text style={[styleMain.header, styles.text]}>Schemes</Text>
-        <SchemesList schemesData={useSchemeStore.scheme} />
+        <SchemesList schemesData={schemeData} />
       </View>
     </>
   );

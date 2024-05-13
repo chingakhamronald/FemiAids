@@ -28,4 +28,5 @@ export const FONT_SIZE = {
 export enum CHECK_SCREEN {
   DASHBOARD = 'DASHBOARD',
   PROFILE = 'PROFILE',
+  CATEGORY = 'CATEGORY',
 }

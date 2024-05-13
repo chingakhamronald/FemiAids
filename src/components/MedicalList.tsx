@@ -1,5 +1,5 @@
-import {View, Text, FlatList, StyleSheet} from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import {View, Text, FlatList, StyleSheet, RefreshControl} from 'react-native';
+import React, {FC} from 'react';
 import {Avatar} from 'react-native-paper';
 import {
   widthPercentageToDP as wp,
@@ -8,60 +8,27 @@ import {
 import {styleMain} from '../styles';
 import {FONT_FAMILY, FONT_SIZE} from '../constants';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import firestore from '@react-native-firebase/firestore';
+import {useQueryMedical} from '../hooks/useQueryMedical';
 
 interface IMedicalList {
   navigation: any;
 }
 
-interface IMedicalData {
-  id: string;
-  name: string;
-  img: string;
-  description: string;
-  symptoms: string;
-  treatment: string;
-}
-
 const MedicalList: FC<IMedicalList> = ({navigation}) => {
-  const [loading, setLoading] = useState(false);
-  const [medicalData, setMedicalData] = useState<IMedicalData[]>([]);
+  const {data: medicalData, isLoading, refetch} = useQueryMedical();
 
-  const ref = firestore().collection('medical');
-
-  useEffect(() => {
-    const unsubscribe = ref.onSnapshot(querySnapshot => {
-      const fetchedMedical: any = [];
-
-      querySnapshot.forEach(doc => {
-        const {description, img, name, symptoms, treatment} = doc.data();
-        fetchedMedical.push({
-          id: doc.id,
-          description: description,
-          img: img,
-          name: name,
-          symptoms: symptoms,
-          treatment: treatment,
-        });
-      });
-
-      setMedicalData(fetchedMedical);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [ref]);
-
-  const onRefresh = () => {
-    setLoading(true);
-  };
+  if (medicalData === undefined || medicalData === null) {
+    return;
+  }
 
   return (
     <>
       <FlatList
         data={medicalData}
-        refreshing={loading}
-        onRefresh={onRefresh}
+        refreshing={isLoading}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={() => refetch()} />
+        }
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={({item}) => {

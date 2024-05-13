@@ -4,24 +4,22 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import {COLOR_TYPE, FONT_FAMILY, FONT_SIZE} from '../constants';
+import {CHECK_SCREEN, COLOR_TYPE, FONT_FAMILY, FONT_SIZE} from '../constants';
 import {Button, Card} from 'react-native-paper';
 import {styleMain} from '../styles';
 import Filter_svg from '../../assets/icons/filter.svg';
-
-interface schemesData {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-}
+import {useStore} from '../hooks/useStore';
+import {ISchemeData} from '../types';
 
 interface ISchemesProps {
-  schemesData: schemesData[];
+  schemesData: ISchemeData[];
 }
+
 const Icons = () => <Filter_svg />;
 
 const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
+  const store = useStore(state => state);
+
   return (
     <View style={[styleMain.flexGrow, styles.flex]}>
       <View style={styles.wrapperContainer}>
@@ -31,6 +29,10 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
         <View style={styles.dropdownWrapper}>
           <Button
             mode="contained"
+            onPress={() => {
+              store.showVisible(true);
+              store.setCheckScreen(CHECK_SCREEN.CATEGORY);
+            }}
             style={[
               styles.btn,
               {
