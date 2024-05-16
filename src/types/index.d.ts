@@ -1,7 +1,8 @@
 export type emergencyDataType = {
   id: any;
-  title: string;
-  mobile_number: number;
+  priority1: number;
+  priority2: number;
+  priority3: number;
 };
 
 export type IMedicalData = {
@@ -30,3 +31,8 @@ export interface ISchemeData {
   category: string;
   url: string;
 }
+
+export type categoryType = {
+  id: string;
+  category_name: string;
+};

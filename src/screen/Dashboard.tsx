@@ -1,15 +1,16 @@
 import {Linking, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {FC} from 'react';
+import React, {FC, Fragment, useEffect, useState} from 'react';
 import {styleMain} from '../styles';
-import FA from '../components/FA';
 import SchemesList from '../components/SchemesList';
 import {
+  ActivityIndicator,
   Button,
   Chip,
   IconButton,
   Modal,
   Portal,
   Surface,
+  TextInput,
 } from 'react-native-paper';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {CHECK_SCREEN, COLOR_TYPE, FONT_FAMILY, FONT_SIZE} from '../constants';
@@ -20,31 +21,76 @@ import AppBar from '../components/AppBar';
 import {IUseStore, useStore} from '../hooks/useStore';
 import {useQueryScheme} from '../hooks/useQueryScheme';
 import {useQueryEmergency} from '../hooks/useQueryEmergency';
-import {emergencyDataType} from '../types';
+import {useQueryCategory} from '../hooks/useQueryCategory';
+import FA from '../components/FA';
+import {useMutationEmergency} from '../hooks/useMutationEmergency';
 
 const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
   const useVisibleState = useStore((state: IUseStore) => state);
 
-  const [schemeData] = useQueryScheme(useVisibleState.category);
+  const {data: emergencyData, isLoading: emergencyLoading} =
+    useQueryEmergency();
 
-  const [emergencyData] = useQueryEmergency();
+  const emergency = Object.assign({}, emergencyData);
+
+  const [emergencyState, setEmergency] = useState({
+    priority1: '',
+    priority2: '',
+    priority3: '',
+  });
+
+  const {data: schemeData, isLoading} = useQueryScheme(
+    useVisibleState?.category,
+  );
+
+  const {data: categoryData, isLoading: categoryLoading} = useQueryCategory();
+
+  const {mutate, isLoading: editLoading} = useMutationEmergency(
+    emergency[0]?.id,
+  );
 
   const handleLink = (mobile_number: number) => {
     return Linking.openURL(`tel:${mobile_number}`);
   };
 
-  const toggleChipSelection = (category: any) => {
-    useVisibleState.setCategory(category);
-  };
+  useEffect(() => {
+    if (emergencyData && emergencyData.length > 0) {
+      setEmergency({
+        priority1: emergencyData[0]?.priority1 || '',
+        priority2: emergencyData[0]?.priority2 || '',
+        priority3: emergencyData[0]?.priority3 || '',
+      });
+    }
+  }, [emergencyData]);
 
-  if (schemeData === undefined || emergencyData === undefined) {
+  if (
+    schemeData === undefined ||
+    emergencyData === undefined ||
+    categoryData === undefined ||
+    emergencyData === undefined
+  ) {
     return;
   }
-  const categories = schemeData.map(e => e.category);
 
-  const uniqueCategories = categories.filter((category, index) => {
-    return categories.indexOf(category) === index;
-  });
+  if (isLoading || categoryLoading || emergencyLoading || editLoading) {
+    return (
+      <View
+        style={[
+          styleMain.flexGrow,
+          {
+            backgroundColor: COLOR_TYPE.secondary,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+        ]}>
+        <ActivityIndicator
+          animating={true}
+          color={COLOR_TYPE.blue}
+          size={'large'}
+        />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -83,45 +129,38 @@ const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
             {useVisibleState.checkScreen === CHECK_SCREEN.CATEGORY ? (
               <View style={{marginVertical: hp('2%')}}>
                 <View style={styles.flex}>
-                  <Text style={styleMain.header}>Category</Text>
-                  <IconButton
-                    icon={'close-circle'}
-                    iconColor={COLOR_TYPE.blue}
-                    size={30}
-                    onPress={() => {
-                      useVisibleState.showVisible(false);
-                      useVisibleState.removeCheckScreen();
-                    }}
-                  />
+                  <Text style={styleMain.header}>Select Category</Text>
                 </View>
-                <ScrollView style={styles.wrapper}>
-                  {uniqueCategories.map((category, idx) => (
+                <ScrollView
+                  contentContainerStyle={[
+                    styles.wrapper,
+                    {maxHeight: hp('50%'), marginVertical: 2},
+                  ]}>
+                  {categoryData.map(e => (
                     <Chip
-                      key={idx}
-                      onPress={() => toggleChipSelection(category)}
-                      selected={category.includes(useVisibleState.category)}
+                      key={e.id}
+                      selectedColor={COLOR_TYPE.blue}
+                      selected={e.category_name === useVisibleState.category}
+                      onPress={() => {
+                        useVisibleState.setCategory(e.category_name);
+                        useVisibleState.showVisible(false);
+                        useVisibleState.removeCheckScreen();
+                      }}
                       style={{
                         marginVertical: 2,
                         marginRight: 5,
                         backgroundColor: COLOR_TYPE.primary,
                       }}>
-                      {category}
+                      <Text
+                        style={{
+                          fontSize: FONT_SIZE.md,
+                          color: COLOR_TYPE.blue,
+                        }}>
+                        {e.category_name}
+                      </Text>
                     </Chip>
                   ))}
                 </ScrollView>
-                <Button
-                  mode="contained"
-                  buttonColor={COLOR_TYPE.blue}
-                  style={[
-                    styles.wrapper,
-                    {
-                      marginTop: hp('2%'),
-                      borderRadius: 10,
-                      padding: hp('1%'),
-                    },
-                  ]}>
-                  Apply
-                </Button>
               </View>
             ) : (
               <View style={{marginVertical: hp('2%')}}>
@@ -142,41 +181,133 @@ const Dashboard: FC<MainNavProps<'Dashboard'>> = ({navigation}) => {
                     }}
                   />
                 </View>
-                {emergencyData?.map((e: emergencyDataType) => {
-                  return (
-                    <View key={e.id} style={styles.wrapper}>
-                      <Text style={[styles.text, {marginVertical: hp('1%')}]}>
-                        {e.title}
-                      </Text>
-                      <Surface style={styles.surface}>
-                        <Text
-                          style={[styles.text, {fontFamily: FONT_FAMILY.bold}]}>
-                          {e.mobile_number}
-                        </Text>
-                        <IconButton
-                          icon={'phone'}
-                          iconColor={COLOR_TYPE.blue}
-                          onPress={() => handleLink(e.mobile_number)}
-                        />
-                      </Surface>
-                    </View>
-                  );
-                })}
                 {useVisibleState.checkScreen === CHECK_SCREEN.PROFILE ? (
-                  <Button
-                    mode="contained"
-                    buttonColor={COLOR_TYPE.blue}
-                    style={[
-                      styles.wrapper,
-                      {
+                  <View style={styles.wrapper}>
+                    <TextInput
+                      mode="outlined"
+                      label="First Priority"
+                      value={emergencyState.priority1}
+                      outlineColor={COLOR_TYPE.blue}
+                      onChangeText={(e: any) => {
+                        setEmergency(prevState => ({
+                          ...prevState,
+                          priority1: e,
+                        }));
+                      }}
+                    />
+                    <TextInput
+                      mode="outlined"
+                      label="Second Priority"
+                      value={emergencyState.priority2}
+                      onChangeText={(e: any) => {
+                        setEmergency(prevState => ({
+                          ...prevState,
+                          priority2: e,
+                        }));
+                      }}
+                      outlineColor={COLOR_TYPE.blue}
+                    />
+                    <TextInput
+                      mode="outlined"
+                      label="Third Priority"
+                      value={emergencyState.priority3}
+                      onChangeText={(e: any) => {
+                        setEmergency(prevState => ({
+                          ...prevState,
+                          priority3: e,
+                        }));
+                      }}
+                      outlineColor={COLOR_TYPE.blue}
+                    />
+                    <Button
+                      mode="contained"
+                      buttonColor={COLOR_TYPE.blue}
+                      onPress={() =>
+                        mutate({
+                          priority1: emergencyState.priority1,
+                          priority2: emergencyState.priority2,
+                          priority3: emergencyState.priority3,
+                        })
+                      }
+                      style={{
                         marginTop: hp('2%'),
                         borderRadius: 10,
-                        padding: hp('1%'),
-                      },
-                    ]}>
-                    Make Changes
-                  </Button>
-                ) : null}
+                        padding: hp('0.5%'),
+                      }}>
+                      <Text style={{color: COLOR_TYPE.white}}>
+                        Make Changes
+                      </Text>
+                    </Button>
+                  </View>
+                ) : (
+                  <>
+                    <Fragment>
+                      <View style={styles.wrapper}>
+                        <Text style={[styles.text, {marginVertical: hp('1%')}]}>
+                          First Priority
+                        </Text>
+                        <Surface style={styles.surface}>
+                          <Text
+                            style={[
+                              styles.text,
+                              {fontFamily: FONT_FAMILY.bold},
+                            ]}>
+                            {emergencyData[0].priority1}
+                          </Text>
+                          <IconButton
+                            icon={'phone'}
+                            iconColor={COLOR_TYPE.blue}
+                            onPress={() =>
+                              handleLink(Number(emergencyState.priority1))
+                            }
+                          />
+                        </Surface>
+                      </View>
+                      <View style={styles.wrapper}>
+                        <Text style={[styles.text, {marginVertical: hp('1%')}]}>
+                          Second Priority
+                        </Text>
+                        <Surface style={styles.surface}>
+                          <Text
+                            style={[
+                              styles.text,
+                              {fontFamily: FONT_FAMILY.bold},
+                            ]}>
+                            {emergencyData[0].priority2}
+                          </Text>
+                          <IconButton
+                            icon={'phone'}
+                            iconColor={COLOR_TYPE.blue}
+                            onPress={() =>
+                              handleLink(Number(emergencyState.priority2))
+                            }
+                          />
+                        </Surface>
+                      </View>
+                      <View style={styles.wrapper}>
+                        <Text style={[styles.text, {marginVertical: hp('1%')}]}>
+                          Third Priority
+                        </Text>
+                        <Surface style={styles.surface}>
+                          <Text
+                            style={[
+                              styles.text,
+                              {fontFamily: FONT_FAMILY.bold},
+                            ]}>
+                            {emergencyData[0].priority3}
+                          </Text>
+                          <IconButton
+                            icon={'phone'}
+                            iconColor={COLOR_TYPE.blue}
+                            onPress={() =>
+                              handleLink(Number(emergencyState.priority3))
+                            }
+                          />
+                        </Surface>
+                      </View>
+                    </Fragment>
+                  </>
+                )}
               </View>
             )}
           </Modal>
@@ -233,6 +364,7 @@ const styles = StyleSheet.create({
     padding: hp('1%'),
     alignItems: 'center',
     borderRadius: 10,
+    backgroundColor: COLOR_TYPE.white,
   },
   tags: {
     flexDirection: 'row',

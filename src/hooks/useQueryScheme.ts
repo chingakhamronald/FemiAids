@@ -3,13 +3,18 @@ import { useQuery } from 'react-query';
 import { ISchemeData } from './useStore';
 
 export const useQueryScheme = (category: string) => {
-  console.log({ category: category });
-
-
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['scheme', category],
     queryFn: async () => {
-      let schemeQuery = firestore().collection('scheme');
+      let schemeQuery;
+
+      if (category === 'All Data') {
+        schemeQuery = firestore().collection('scheme');
+      } else {
+        schemeQuery = firestore()
+          .collection('scheme')
+          .where('category', '==', category);
+      }
 
       const querySnapshot = await schemeQuery.get();
       return querySnapshot.docs.map(doc => ({
@@ -18,5 +23,5 @@ export const useQueryScheme = (category: string) => {
       })) as ISchemeData[];
     },
   });
-  return [data];
+  return { data, isLoading };
 };

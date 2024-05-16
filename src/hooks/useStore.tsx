@@ -3,7 +3,7 @@ import {create} from 'zustand';
 export interface IUseStore {
   visible: boolean;
   checkScreen: string;
-  category: string;
+  category: any;
   setCheckScreen: (value: string) => void;
   showVisible: (value: boolean) => void;
   hideVisible: (value: boolean) => void;
@@ -14,7 +14,7 @@ export interface IUseStore {
 export const useStore = create<IUseStore>(set => ({
   visible: false,
   checkScreen: '',
-  category: '',
+  category: 'All Data',
   setCheckScreen: (value: string) => set({checkScreen: value}),
   showVisible: (value: boolean) => set({visible: value}),
   hideVisible: (value: boolean) => set({visible: value}),

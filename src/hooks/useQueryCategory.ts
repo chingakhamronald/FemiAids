@@ -1,19 +1,20 @@
 import { useQuery } from 'react-query';
 import firestore from '@react-native-firebase/firestore';
-import { emergencyDataType } from '../screen/Dashboard';
+import { categoryType } from '../types';
 
 
-export const useQueryEmergency = () => {
+
+export const useQueryCategory = () => {
   const { data, isLoading } = useQuery({
-    queryKey: ['emergency'],
+    queryKey: ['category'],
     queryFn: async () => {
-      const emergencyQuery = firestore().collection('emergency');
+      const categoryQuery = firestore().collection('category');
 
-      const querySnapshot = await emergencyQuery.get();
+      const querySnapshot = await categoryQuery.get();
       return querySnapshot.docs.map(doc => ({
         id: doc?.id,
         ...doc?.data(),
-      })) as emergencyDataType[];
+      })) as categoryType[];
     },
   });
   return { data, isLoading };

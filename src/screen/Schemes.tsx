@@ -6,9 +6,12 @@ import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import AppBar from '../components/AppBar';
 import {MainNavProps} from '../router/MainNavigation';
 import {useQueryScheme} from '../hooks/useQueryScheme';
+import {useStore} from '../hooks/useStore';
 
 const Schemes: FC<MainNavProps<'Schemes'>> = ({navigation}) => {
-  const [schemeData] = useQueryScheme();
+  const useGlobalStore = useStore(state => state);
+
+  const {data: schemeData} = useQueryScheme(useGlobalStore?.category);
 
   if (schemeData === undefined) {
     return;
