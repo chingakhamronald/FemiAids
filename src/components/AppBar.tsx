@@ -22,7 +22,7 @@ const AppBar: FC<IAppBarProps> = ({navigation, check}) => {
           }}
         />
       ) : null}
-      <Appbar.Content title="FemiAids" titleStyle={styles.title} />
+      <Appbar.Content title="FemAid" titleStyle={styles.title} />
       <Appbar.Action
         icon={'account-circle'}
         size={35}

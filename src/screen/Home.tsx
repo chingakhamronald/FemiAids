@@ -19,11 +19,11 @@ const Home: FC<MainNavProps<'Home'>> = ({navigation}) => {
           <View style={styles.logoContainer}>
             <Logo style={styles.img1} />
             <Text style={[styleMain.header, {color: COLOR_TYPE.white}]}>
-              FemiAids
+              FemAid
             </Text>
           </View>
           <View style={styles.textContainer}>
-            <Text style={styleMain.header}>Welcome to FemiAids</Text>
+            <Text style={styleMain.header}>Welcome to FemAid</Text>
             <Text style={styleMain.subheader}>
               Safety and Support in One Touch
             </Text>

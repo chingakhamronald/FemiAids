@@ -77,6 +77,7 @@ const SchemesList: FC<ISchemesProps> = ({schemesData}) => {
             <View style={styles.cardContainer} key={item.id}>
               <Card.Title
                 title={item.name}
+                subtitle={item.description}
                 titleStyle={[styleMain.header, {fontSize: hp('2.5%')}]}
                 style={styles.card}
                 right={() => <Btn URL={item.url} />}
